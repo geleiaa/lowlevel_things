@@ -8,10 +8,24 @@
 
 
 echo "\n#################################"
+echo "APT UPDATE ..."
+echo "#################################\n"
+
+sudo apt update
+
+
+echo "\n#################################"
 echo "INSTALLING gdb ..."
 echo "#################################\n"
 
 sudo apt -y install gdb
+
+
+echo "\n#################################"
+echo "INSTALLING git ..."
+echo "#################################\n"
+
+sudo apt -y install git
 
 
 echo "\n#################################"
