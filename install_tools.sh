@@ -2,14 +2,14 @@
 
 ##################################################################################################
 # Simple script to automate installation of a set of tools for reverse engineering on linux vms
-# This script install: build-essential, binutils, gcc, gdb and gdb-peda plugin...
-# and if not installed: file, objdump, hexdump, xxd, ltrace, strace...
+# This script install: build-essential, binutils, git, gcc, gdb and gdb-peda plugin, file, objdump,
+# hexdump, xxd, ltrace, strace...
 # Create by geleiaa
-# Version: 2.0
+# Version: 3.0
 ##################################################################################################
 
 
-tools='file objdump hexdump xxd ltrace strace'
+tools='file objdump hexdump xxd ltrace strace git'
 
 # check if some tools is installed
 # later add more tools to check...
@@ -54,17 +54,24 @@ is_installed
 
 
 echo "\n================================="
+echo "INSTALLING \e[34m build-essential \e[0m..."
+echo "=================================\n"
+
+sudo apt -y install build-essential
+
+
+echo "\n================================="
+echo "INSTALLING \e[34m binutils \e[0m..."
+echo "=================================\n"
+
+sudo apt -y install binutils
+
+
+echo "\n================================="
 echo "INSTALLING \e[34m gdb \e[0m..."
 echo "=================================\n"
 
 sudo apt -y install gdb
-
-
-echo "\n================================="
-echo "INSTALLING \e[34m git \e[0m..."
-echo "=================================\n"
-
-sudo apt -y install git
 
 
 echo "\n================================="
@@ -77,26 +84,5 @@ echo "DONE! debug your program with gdb and enjoy"
 
 
 echo "\n================================="
-echo "INSTALLING \e[34m gcc \e[0m..."
-echo "=================================\n"
-
-sudo apt -y install gcc
-
-
-echo "\n================================="
-echo "INSTALLING \e[34m binutils \e[0m..."
-echo "=================================\n"
-
-sudo apt -y install binutils
-
-
-echo "\n================================="
-echo "INSTALLING \e[34m build-essential \e[0m..."
-echo "=================================\n"
-
-sudo apt -y install build-essential
-
-
-echo "\n================================="
-echo "\e[32mFINISHED INSTALLATION o/\e[0m"
+echo "\e[32m FINISHED INSTALLATION o/ \e[0m"
 echo "=================================\n"
