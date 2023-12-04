@@ -1,3 +1,3 @@
-### Repo for things related to my reverse engineering studies.
+### Repo for things related to my low level studies (rev-eng, bin-exp, maldev...)
 
 
