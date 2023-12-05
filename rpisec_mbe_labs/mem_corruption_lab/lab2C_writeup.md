@@ -80,16 +80,16 @@ Now running with a input the exec flow throws us to another place. First compare
 ![witharg1](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/witharg1.png)
 
 
-After some steps we arrive at the **strcpy** function that we saw before. We can see that the input is moved through the registers until it reaches the **strcpy** function. And then a comparison with "0xdeafbeef".
+After some steps we arrive at the **strcpy** function that we saw before. We can see that the input is moved through the registers until it reaches the **strcpy** function. And probably the input is copied somewhere by the **strcpy** function. Soon after, a comparison of address **DWORD PTR [rbp-0x4]** with "0xdeadbeef" takes place.
 
 
 ![witharg2](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/witharg2.png)
 
 
-After comparing if equal to "0xdeadbeef" the flow jump to "shell" function. If not equal the flow jump to a **printf** with a message "Not authenticated. set_me was 0" and finishe execution.
+After comparing if **DWORD PTR [rbp-0x4]** address is equal to "0xdeadbeef" the flow jump to "shell" function. If not equal the flow jump to a **printf** with a message "Not authenticated. set_me was 0" and finishe execution.
 
 
-* jump to end of flow
+* jump to end
 
 ![witharg3](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/witharg3.png)
 
@@ -131,7 +131,7 @@ Getting close to the part that checks the input we can see the alphabet buffer b
 
 
 
-Passing in **strcpy** function the buffer is stored and after this the address **DWORD PTR [rbp-0x4]** will have what that will be compared.
+Passing in **strcpy** function the buffer is stored and after this the address **DWORD PTR [rbp-0x4]** will be compared.
 
 ![compare1](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/compare1.png)
 
@@ -163,7 +163,6 @@ AAAAAAAABBBBBBB0xdeadbeef
 Using a python code to make it easier, we will print the buffer and send it to the binary input. The exploit looks like this:
 
 ```py
-import sys
 import struct
 
 buf = b''
