@@ -9,7 +9,7 @@
 ##################################################################################################
 
 
-tools='file objdump hexdump xxd ltrace strace git'
+tools='file objdump hexdump xxd ltrace strace git python3'
 
 # check if some tools is installed
 # later add more tools to check...
