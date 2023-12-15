@@ -122,4 +122,69 @@ We see that the functions probably take the input and do a comparison using the 
 ### Now that we know what the binary does, we can do some tests to find the best path to shellcode, which is the idea of ​​this lab.
 
 
+Following the exploration pattern, we first have to test whether any variable can be overflowed. Putting breakpoints in the verification functions right after the input goes to the binary and put a pattern on the inputs and see how it is handled.
+
+
+![breakfuncs](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/breakfuncs.png)
+
+
+Let's use the alphabet pattern like in the previous lab, so we know when there was a memory leak:
+
+```
+AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDDEEEEEEEEFFFFFFFFGGGGGGGGHHHHHHHHIIIIIIIIJJJJJJJJKKKKKKKKLLLLLLLLMMMMMMMMNNNNNNNNOOOOOOOOPPPPPPPPQQQQQQQQRRRRRRRRSSSSSSSSTTTTTTTTUUUUUUUUVVVVVVVVWWWWWWWWXXXXXXXXYYYYYYYYZZZZZZZZ
+```
+
+After a few steps in **verify_user_name** we stop at the **strcmp** function call and see the comparison with the string "rpisec". And we can also notice that one of **strcmp** arguments is "6", which would be the number of bytes that the function will validate.
+
+
+![verfname](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/verfname1.png)
+
+
+So the first 6 bytes of the input have to be "rpisec". This can be confirmed because after we go through **strncmp** the flow jumps to a comparison and then print "incorrect username".
+
+
+![incorrname](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/incorrname.png)
+
+
+Then the execution is finished.
+
+
+### Passing verify_user_name
+
+So if we put the string "rpisec" before the pattern we see that **strncpm** only reads the first 6 bytes and with this it is possible to pass the username check.
+
+
+![passverifname](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/passverifname.png)
+
+
+After passing the username verification we arrive at the **verify_user_pass** function. And we can see the password verification being done:
+
+
+![verifpass](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/verifpass1.png)
+
+
+As expected, after passing **strncmp** the flow jumps to a comparison and then to the end, but... 
+
+
+![incorrpass](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/incorrpass.png)
+
+
+I noticed that no return address was overwritten, neither from **verify_user_name** or **verify_user_pass**. Until we reached the return address of the main function, which got stuck because it was overwritten by our alphabet patter.
+
+
+![retmain](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/retmain.png)
+
+
+We can notice that after 88 bytes of the pattern the return address of main is overwritten. 
+
+```
+AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDDEEEEEEEEFFFFFFFFGGGGGGGGHHHHHHHHIIIIIIIIJJJJJJJJKKKKKKKKLLLLLLLLMMMMMMMMNNNNNNNN
+|			88 bytes is stored in variable				       ||  this is overflowed  |       
+|______________________________________________________________________________________||______________________|
+```
+
+We have our buffer-overflow!
+
+
+### Shellcode time
 
