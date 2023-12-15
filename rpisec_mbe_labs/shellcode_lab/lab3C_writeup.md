@@ -203,7 +203,7 @@ With this we can know that the username variable will not be stored in the stack
 If we look at the disassembly of the main function we see that the address of the username variable is referenced before being passed to the **fgets** function and then to the **verify_user_name** function.
 
 
-![usernamevar](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/usrnmvar.png)
+![usernamevar](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/usrnmvar1.png)
 
 
 And checking the variable's memory we see the string "rpisec".
