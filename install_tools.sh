@@ -9,7 +9,7 @@
 ##################################################################################################
 
 
-tools='file objdump hexdump xxd ltrace strace git python3'
+tools='file objdump hexdump xxd ltrace strace git python3 pip'
 
 # check if some tools is installed
 # later add more tools to check...
@@ -81,6 +81,13 @@ echo "=================================\n"
 git clone https://github.com/longld/peda.git ~/peda
 echo "source ~/peda/peda.py" >> ~/.gdbinit
 echo "DONE! debug your program with gdb and enjoy"
+
+
+echo "\n================================="
+echo "INSTALLING \e[34m ROPgadget \e[0m..."
+echo "=================================\n"
+
+sudo -H python3 -m pip install ROPgadget
 
 
 echo "\n================================="
