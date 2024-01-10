@@ -8,11 +8,13 @@ O NX/DEP é uma técnica de mitigação de exploração usada para garantir que 
 
 Ok, mas como assim somente segmentos de código marcados como executáveis??
 
-Bom, vamos lá. Nos writeups anteriores vimos que para explorar os binários, usamos a técnica de Buffer-overflow para sobrescrever um endereço de returno e, logo depois dessa sobrescrita, jogamos algum shellcode na stack, para assim ganharmos controle sobre o fluxo de execução do binário. Essa exploração só é possível porque o binario em questão foi compilado com a flag ``` -z execstack ``` que desabilita a proteção NX.
+Bom, vamos lá. Nos writeups anteriores vimos que para explorar os binários, usamos a técnica de Buffer-overflow para sobrescrever um endereço de retorno e, logo depois dessa sobrescrita, jogamos algum shellcode na stack, para assim ganharmos controle sobre o fluxo de execução do binário. Essa exploração só é possível porque o binário em questão foi compilado com a flag ``` -z execstack ``` que desabilita a proteção NX.
 
-Agora com a proteção ativada, as areas da stack e heap NÃO possuem permissão de execução. Sendo assim não será possível realizar a exploração jogando algum shellcode na stack, porque simplesmente não será executado (e provavelmente resultara em um SEGFAULT).
+Agora com a proteção ativada, as areas da stack e heap NÃO possuem permissão de execução. Sendo assim, não será possível realizar a exploração jogando algum shellcode na stack, porque simplesmente não será executado (e provavelmente resultara em um SEGFAULT).
 
 Sabendo disso, vamos para a parte do bypass...
+
+### Bypass
 
 * "If you can’t inject (shell)code to do your bidding, you
 must re-use the existing code!" RPISEC - MBE lecture_07
@@ -20,9 +22,9 @@ must re-use the existing code!" RPISEC - MBE lecture_07
 Se você não pode injetar código... reutilize o código existente.
 
 
-O bypass mais conhecido para NX é o ROP ``` (Return Oriented Programming)```. ROP é uma tecnica para reutilizar código/instruções existentes em um binário para montar algo malicioso. Outros termos conhecidos são ``` ROPgadgets/Gadgets ``` e ``` ROPchain ```.
+O bypass mais conhecido para o NX é o ROP ```(Return Oriented Programming)```. ROP é uma técnica para reutilizar código/instruções existentes em um binário para montar algo malicioso. Outros termos conhecidos são ``` ROPgadgets/Gadgets ``` e ``` ROPchain ```.
 
-Os ``` ROPgadgets ``` ou só ``` Gadgets ``` basicamente são instruções presentes na memória do binário, não fazem parte da execução da ```main```, mas podem ser utilizadas porque são parte da execução do binário (e geralemente terminam com uma instrução ```RET```). Esses gadgets podem ser usados para montar instruções maliciosas semelhante a um shellcode, e isso é chamado de ``` ROPchain ```.
+Os ``` ROPgadgets ``` ou só ``` Gadgets ``` basicamente são instruções presentes na memória do binário, que não fazem parte da execução da ```main```, mas podem ser utilizadas porque são parte da execução do binário (e geralemente terminam com uma instrução ```RET```). Esses gadgets podem ser usados para montar instruções maliciosas semelhante a um shellcode, e junção dos gadgets é chamada de ``` ROPchain ```.
 
 
 ### Tudo bem, ja sabemos o que é o NX e qual tecnica é usada para "bypassa-lo". Agora vamos para a demonstração:
@@ -33,12 +35,12 @@ Para o exemplo chamaremos a função ```system()```, e como a função system() 
 
 ### Step by step da exploração
 
-1 - O binário usado de exemplo nas aulas era vulneravel a um B.O.F, então a primeira coisa a fazer é estourar o buffer e controlar algum endereço de retorno.
+#### 1 - O binário usado de exemplo nas aulas era vulneravel a um B.O.F, então a primeira coisa a fazer é estourar o buffer e controlar algum endereço de retorno.
 
 
-2 - Depois de explorar o B.O.F precisamos saber qual ```Gadget``` pode ser usado de forma maliciosa. Para isso vamos usar a tool ROPgadget (https://github.com/JonathanSalwan/ROPgadget) .
+#### 2 - Depois de explorar o B.O.F precisamos saber qual ```Gadget``` pode ser usado de forma maliciosa. Para isso vamos usar a tool ROPgadget (https://github.com/JonathanSalwan/ROPgadget) .
 
-Vamos procurar por ```gadgets``` filtrando por ```"pop rdi"```. Porque os registradores ```RDI``` e ```RSI``` são usados para passagem de argumentos na arquitetura de 64 bits.
+Vamos procurar por ```gadgets``` filtrando por ```"pop rdi"```. Porque os registradores ```RDI``` e ```RSI``` são usados para passagem de argumentos na arquitetura de 64 bits. Para que o argumento "/bin/sh" seja passado para a função system ele precisa estar em algum desses registradores.
 
 Rodando a tool e analisando a saida, vemos a instrução que precisamos:
 
@@ -58,7 +60,7 @@ $ ROPgadget --binary aula_13 --ropchain | grep "pop"
 Deixe o endereço separado e vamos para o próximo passo.
 
 
-3 - Agora precisamos achar o endereço da string ```"/bin/sh"``` na memória a qual o binário tem acesso em tempo de execução. 
+#### 3 - Agora precisamos achar o endereço da string ```"/bin/sh"``` na memória a qual o binário tem acesso em tempo de execução. 
 
 Para isso vamos rodar o binário no GDB, setar um breakpoint qualquer e logo depois da execução parar no breakpoint, vamos buscar pela string "/bin/sh" da seguinte forma: ``` gdb-peda$ find "/bin/sh" ```
 
@@ -73,7 +75,7 @@ Deixe esse endereço separado também e vamos para o próximo passo.
 
 
 
-4 - A ultima das nossas buscas será pelo endereço da função ```system()```. Fazendo da mesma forma que o endereço de "/bin/sh".
+#### 4 - A ultima das nossas buscas será pelo endereço da função ```system()```. Fazendo da mesma forma que o endereço de "/bin/sh".
 
 Rode o binário no GDB, sete um breakpoint qualquer e logo depois da execução parar no breakpoint, busque pelo endereço da seguinte forma: ``` gdb-peda$ p system ```
 
@@ -84,7 +86,7 @@ $1 = {int (const char *)} 0x7ffff7e12290 <__libc_system>
 ```
 
 
-5 - Depois de ter os endereços necessários vamos montar o script do exploit:
+#### 5 - Depois de ter os endereços necessários vamos montar o script do exploit:
 
 
 ```py
@@ -101,40 +103,35 @@ f.write(buf)
 ```
 
 
-6 - Agora com tudo pronto vamos executar o exploit e ver como tudo funciona:
-
-
-* Passando o arquivo com o junk da exploração:
-
-(img)
+#### 6 - Agora com tudo pronto vamos executar o exploit e ver como tudo funciona:
 
 
 * RET sobrescrito com o Gadget
 
-(img)
+![nx1](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx1.png)
 
 
 * O "/bin/sh" seguido pelo função system na stack
 
-(img)
+![nx2](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx2.png)
 
 
 * "/bin/sh" passado para o registrador RDI
 
-(img)
+![nx3](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx3.png)
 
 
 * entrando na função system 
 
-(img)
+![nx4](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx4.png)
 
 
 * termina execução e sai startando um novo processo
 
-(img)
+![nx5](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx5.png)
 
 
 * rodando exploração fora do GDB
 
-(img)
+![nx6](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx6.png)
 

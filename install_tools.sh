@@ -8,6 +8,10 @@
 # Version: 3.0
 ##################################################################################################
 
+##########################################################################
+# Note: gdb, bunutils and build-essential installation error "FATAL Fork"
+##########################################################################
+
 
 tools='file objdump hexdump xxd ltrace strace git python3 pip'
 
@@ -46,12 +50,15 @@ echo "=================================\n"
 
 sudo apt update
 
+sleep 2
+
 echo "\n================================="
 echo "CHECKING SOME TOOLS ..."
 echo "=================================\n"
 
 is_installed
 
+sleep 2
 
 echo "\n================================="
 echo "INSTALLING \e[34m build-essential \e[0m..."
@@ -59,33 +66,41 @@ echo "=================================\n"
 
 sudo apt -y install build-essential
 
+sleep 2
 
 echo "\n================================="
 echo "INSTALLING \e[34m binutils \e[0m..."
 echo "=================================\n"
 
+
 sudo apt -y install binutils
 
+sleep 2
 
 echo "\n================================="
 echo "INSTALLING \e[34m gdb \e[0m..."
 echo "=================================\n"
 
+
 sudo apt -y install gdb
 
+sleep 2
 
 echo "\n================================="
 echo "INSTALLING \e[34m gdb-peda \e[0m..."
 echo "=================================\n"
 
+
 git clone https://github.com/longld/peda.git ~/peda
 echo "source ~/peda/peda.py" >> ~/.gdbinit
-echo "DONE! debug your program with gdb and enjoy"
+
+sleep 2
 
 
 echo "\n================================="
 echo "INSTALLING \e[34m ROPgadget \e[0m..."
 echo "=================================\n"
+
 
 sudo -H python3 -m pip install ROPgadget
 
