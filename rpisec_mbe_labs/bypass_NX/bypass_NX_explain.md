@@ -24,14 +24,14 @@ Se você não pode injetar código... reutilize o código existente.
 
 O bypass mais conhecido para o NX é o ROP ```(Return Oriented Programming)```. ROP é uma técnica para reutilizar código/instruções existentes em um binário para montar algo malicioso. Outros termos conhecidos são ``` ROPgadgets/Gadgets ``` e ``` ROPchain ```.
 
-Os ``` ROPgadgets ``` ou só ``` Gadgets ``` basicamente são instruções presentes na memória do binário, que não fazem parte da execução da ```main```, mas podem ser utilizadas porque são parte da execução do binário (e geralemente terminam com uma instrução ```RET```). Esses gadgets podem ser usados para montar instruções maliciosas semelhante a um shellcode, e junção dos gadgets é chamada de ``` ROPchain ```.
+Os ``` ROPgadgets ``` ou só ``` Gadgets ``` basicamente são instruções presentes na memória do binário, que não fazem parte da execução da ```main```, mas podem ser utilizadas porque são parte da execução do binário (e geralemente terminam com uma instrução ```RET```). Esses gadgets podem ser usados para montar instruções maliciosas semelhante a um shellcode. A junção desses gadgets é chamada de ``` ROPchain ```.
 
 
 ### Tudo bem, ja sabemos o que é o NX e qual tecnica é usada para "bypassa-lo". Agora vamos para a demonstração:
 
 A ideia é a seguinte: já que não podemos executar um shellcode através da stack, temos que executar algo parecido, então vamos usar a técnica ```ret2libc```. Essa técnica consiste em fazer o binário chamar funções da libc usando os endereços de memória carregados pelo próprio binário em tempo de execução. 
 
-Para o exemplo chamaremos a função ```system()```, e como a função system() sem argumentos não faz nada, vamos passar pra ela a string ```"/bin/sh"``` como argumento. Dessa forma temos algo parecido com um shellcode.
+Para o exemplo chamaremos a função ```system()```, e como a função system() sem argumentos não faz nada, vamos passar pra ela a string ```"/bin/sh"``` . Dessa forma temos algo parecido com um shellcode.
 
 ### Step by step da exploração
 
@@ -40,7 +40,7 @@ Para o exemplo chamaremos a função ```system()```, e como a função system() 
 
 #### 2 - Depois de explorar o B.O.F precisamos saber qual ```Gadget``` pode ser usado de forma maliciosa. Para isso vamos usar a tool ROPgadget (https://github.com/JonathanSalwan/ROPgadget) .
 
-Vamos procurar por ```gadgets``` filtrando por ```"pop rdi"```. Porque os registradores ```RDI``` e ```RSI``` são usados para passagem de argumentos na arquitetura de 64 bits. Para que o argumento "/bin/sh" seja passado para a função system ele precisa estar em algum desses registradores.
+Vamos procurar ```gadgets``` filtrando por ```"pop rdi"```. Porque os registradores ```RDI``` e ```RSI``` são usados para passagem de argumentos na arquitetura de 64 bits. Para que o argumento "/bin/sh" seja passado para a função system ele precisa estar em algum desses registradores.
 
 Rodando a tool e analisando a saida, vemos a instrução que precisamos:
 
@@ -94,7 +94,7 @@ import struct
 
 buf = b""
 buf += b"A"*88                              #JUNK
-buf += struct.pack("<Q", 0x4011b3)      	#POP RDI; RET;
+buf += struct.pack("<Q", 0x4011b3)      #POP RDI; RET;
 buf += struct.pack("<Q", 0x7ffff7f745bd)    #POINTER TO "/bin/sh"
 buf += struct.pack("<Q", 0x7ffff7e12290)    #SYSTEM ADDR
 
@@ -111,7 +111,7 @@ f.write(buf)
 ![nx1](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx1.png)
 
 
-* O "/bin/sh" seguido pelo função system na stack
+* O "/bin/sh" seguido pela função system na stack
 
 ![nx2](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx2.png)
 
@@ -126,12 +126,12 @@ f.write(buf)
 ![nx4](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx4.png)
 
 
-* termina execução e sai startando um novo processo
+* GDB termina execução e sai startando um novo processo
 
 ![nx5](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx5.png)
 
 
-* rodando exploração fora do GDB
+* rodando a exploração fora do GDB
 
 ![nx6](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/bpnx6.png)
 
