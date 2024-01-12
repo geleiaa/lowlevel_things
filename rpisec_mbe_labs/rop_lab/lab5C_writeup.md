@@ -3,7 +3,7 @@
 
 ### This lab is related to the exploration of DEP/NX.
 
-First I'm going to talk about the problem I had with compiling of the binary. This lab was made for the 32-bit architecture and its exploration as well. So because of some problems with address randomization I had to add the flag ``` -no-pie``` to compile it. It was compiled like this: 
+First I'll talk about the problem I had with compiling the binary. This lab is made for 32-bit architecture and the exploit is also 32-bit based. And my idea was to do it in 64. So, due to some problems with address randomization, I had to add the ``` -no-pie``` flag to compile it. It was compiled like this:
 
 ```gcc lab5C.c -o lab5C -fno-stack-protector -no-pie```
 
@@ -137,9 +137,8 @@ note: It is worth remembering that the machine's ASLR must be disabled otherwise
 
 ### pwn!
 
-![exp3](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/exprop3.png)
+![exp4](https://github.com/geleiaa/lowlevel_things/blob/main/imgs/exprop4.png)
 
 
 
-Remembering that the idea of this lab was to be done in 32-bit architecture but I decided to do it in 64-bit because it was more current. In 32 bits, it changes how the exploit is done by passing the system() function arguments through the stack. The rest is basically the same.
-
+Remembering that the idea of this laboratory was to be done in 32-bit architecture but I decided to do it in 64-bit because it was more current. In 32 bits, it changes the way exploration is done, passing system() function arguments through the stack and not through registers. The rest is basically the same.
