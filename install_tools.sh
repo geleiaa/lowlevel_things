@@ -5,7 +5,8 @@
 # This script install: build-essential, binutils, git, gcc, gdb and gdb-peda plugin, file, objdump,
 # hexdump, xxd, ltrace, strace...
 # Create by geleiaa
-# Version: 3.0
+# Version: 4.0
+# changelog: add pwntools
 ##################################################################################################
 
 
@@ -89,6 +90,13 @@ echo "INSTALLING \e[34m ROPgadget \e[0m..."
 echo "=================================\n"
 
 sudo -H python3 -m pip install ROPgadget
+
+
+echo "\n================================="
+echo "INSTALLING \e[34m PwnTools \e[0m..."
+echo "=================================\n"
+
+python3 -m pip install --upgrade pwntools
 
 
 echo "\n================================="
