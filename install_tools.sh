@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##################################################################################################
-# Simple script to automate installation of a set of tools for reverse engineering on linux vms
+# Simple script to automate installation of a set of tools for rev-eng and bin-exp on linux vms
 # This script install: build-essential, binutils, git, gcc, gdb and gdb-peda plugin, file, objdump,
 # hexdump, xxd, ltrace, strace...
 # Create by geleiaa
