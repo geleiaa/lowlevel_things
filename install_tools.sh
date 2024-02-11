@@ -1,16 +1,20 @@
 #!/bin/bash
 
-##################################################################################################
-# Simple script to automate installation of a set of tools for rev-eng and bin-exp on linux vms
-# This script install: build-essential, binutils, git, gcc, gdb and gdb-peda plugin, file, objdump,
-# hexdump, xxd, ltrace, strace...
+##############################################################################################################
+# Simple script to automate installation of a toolset for rev-eng, bin-exp and mal-analysis on linux vms.
+#
+#
+# This script install: build-essential, binutils, git, gcc, gdb and gdb-peda plugin, objdump, hexdump, 
+# xxd, ltrace, strace, python3, pip, ROPgadget, pwntools, die, elfparser ...
+#
+#
 # Create by geleiaa
-# Version: 4.0
-# changelog: add pwntools
-##################################################################################################
+# Version: 5.0
+# changelog: add malware analysis tools
+##############################################################################################################
 
 
-tools='file objdump hexdump xxd ltrace strace git python3 pip'
+tools='objdump hexdump xxd ltrace strace git python3 pip'
 
 # check if some tools is installed
 # later add more tools to check...
@@ -39,6 +43,7 @@ do
 	fi
 done
 }
+
 
 
 echo "\n================================="
@@ -97,6 +102,24 @@ echo "INSTALLING \e[34m PwnTools \e[0m..."
 echo "=================================\n"
 
 python3 -m pip install --upgrade pwntools
+
+
+echo "\n================================="
+echo "DOWNLOADING \e[34m Detect-It-Easy \e[0m..."
+echo "=================================\n"
+
+wget https://github.com/horsicq/DIE-engine/releases/download/3.08/Detect_It_Easy-3.08-x86_64.AppImage -P ~/Desktop
+
+chmod +x ~/Desktop/Detect_It_Easy-3.08-x86_64.AppImage
+
+
+echo "\n================================="
+echo "DOWNLOADING \e[34m Detect-It-Easy \e[0m..."
+echo "=================================\n"
+
+wget http://elfparser.com/release/elfparser_x86_64_1.4.0.deb -P ~/Dowloads
+
+sudo dpkg -i ~/Dowloads/elfparser_x86_64_1.4.0.deb
 
 
 echo "\n================================="
