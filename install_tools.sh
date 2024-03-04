@@ -119,7 +119,7 @@ echo "=================================\n"
 
 wget http://elfparser.com/release/elfparser_x86_64_1.4.0.deb -P ~/Dowloads
 
-sudo dpkg -i ~/Dowloads/elfparser_x86_64_1.4.0.deb
+sudo dpkg -i ~/Downloads/elfparser_x86_64_1.4.0.deb
 
 
 echo "\n================================="
