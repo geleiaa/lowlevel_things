@@ -91,6 +91,13 @@ echo "source ~/peda/peda.py" >> ~/.gdbinit
 
 
 echo "\n================================="
+echo "DOWNLOADING \e[34m wxHexEditor \e[0m..."
+echo "=================================\n"
+
+sudo apt -y install wxhexeditor
+
+
+echo "\n================================="
 echo "INSTALLING \e[34m ROPgadget \e[0m..."
 echo "=================================\n"
 
@@ -117,9 +124,16 @@ echo "\n================================="
 echo "DOWNLOADING \e[34m Detect-It-Easy \e[0m..."
 echo "=================================\n"
 
-wget http://elfparser.com/release/elfparser_x86_64_1.4.0.deb -P ~/Dowloads
+wget http://elfparser.com/release/elfparser_x86_64_1.4.0.deb -P ~/Downloads
 
 sudo dpkg -i ~/Downloads/elfparser_x86_64_1.4.0.deb
+
+
+echo "\n================================="
+echo "DOWNLOADING \e[34m Downloading IDA free \e[0m..."
+echo "=================================\n"
+
+wget https://out7.hex-rays.com/files/idafree84_linux.run -P ~/Downloads
 
 
 echo "\n================================="
