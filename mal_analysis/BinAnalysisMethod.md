@@ -74,7 +74,7 @@
 ```
 
 
-### Identify Packer Binary: 
+### Identify Packed Binary: 
 
 * Detec It Easy (DIE) tool
 
